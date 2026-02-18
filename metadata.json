@@ -1,0 +1,7 @@
+{
+  "name": "PayFast UPI",
+  "description": "A modern, secure UPI payment application with smart spending insights and seamless money transfers.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
