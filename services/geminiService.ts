@@ -1,10 +1,27 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { Transaction } from "../types";
+import { Transaction } from "../types.ts";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Safe initialization to prevent white screen on module load
+const getAIInstance = () => {
+  const apiKey = typeof process !== 'undefined' ? process.env.API_KEY : '';
+  if (!apiKey) return null;
+  return new GoogleGenAI({ apiKey });
+};
 
 export async function getSpendingInsights(transactions: Transaction[]) {
+  const ai = getAIInstance();
+  if (!ai) {
+    return {
+      insights: [
+        "Insight generation unavailable without API key.",
+        "Check your connection to see recent spending trends.",
+        "Maintain a healthy balance for upcoming bills."
+      ],
+      tip: "Set a monthly budget to track your expenses better."
+    };
+  }
+
   const transactionData = transactions.map(t => ({
     title: t.title,
     amount: t.amount,

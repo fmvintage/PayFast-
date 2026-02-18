@@ -24,21 +24,21 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-// Components
-import BottomNav from './components/BottomNav';
-import TransactionItem from './components/TransactionItem';
-import BankCard from './components/BankCard';
-import ActionGrid from './components/ActionGrid';
-import ScanScreen from './pages/ScanScreen';
-import HistoryScreen from './pages/HistoryScreen';
-import ProfileScreen from './pages/ProfileScreen';
-import AdminDashboard from './pages/AdminDashboard';
-import RewardsScreen from './pages/RewardsScreen';
-import PinModal from './components/PinModal';
-import PaymentDrawer from './components/PaymentDrawer';
+// Components - Added explicit extensions
+import BottomNav from './components/BottomNav.tsx';
+import TransactionItem from './components/TransactionItem.tsx';
+import BankCard from './components/BankCard.tsx';
+import ActionGrid from './components/ActionGrid.tsx';
+import ScanScreen from './pages/ScanScreen.tsx';
+import HistoryScreen from './pages/HistoryScreen.tsx';
+import ProfileScreen from './pages/ProfileScreen.tsx';
+import AdminDashboard from './pages/AdminDashboard.tsx';
+import RewardsScreen from './pages/RewardsScreen.tsx';
+import PinModal from './components/PinModal.tsx';
+import PaymentDrawer from './components/PaymentDrawer.tsx';
 
-// Types and Mocks
-import { MOCK_USER, MOCK_TRANSACTIONS, MOCK_BANKS, MOCK_BILLS, BILL_ICON_MAP } from './constants';
+// Types and Mocks - Added explicit extensions
+import { MOCK_USER, MOCK_TRANSACTIONS, MOCK_BANKS, MOCK_BILLS, BILL_ICON_MAP } from './constants.tsx';
 
 const MainApp: React.FC = () => {
   const navigate = useNavigate();
@@ -108,7 +108,6 @@ const MainApp: React.FC = () => {
         <Routes>
           <Route path="/" element={
             <div className="p-4 space-y-6">
-              {/* Wallet/Bank Balance Overview */}
               <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-blue-200 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
                 <div className="flex justify-between items-start mb-6">
@@ -142,10 +141,8 @@ const MainApp: React.FC = () => {
                 </div>
               </div>
 
-              {/* Fast Actions */}
               <ActionGrid onActionClick={onActionGridClick} />
 
-              {/* Bills & Recharges */}
               <div>
                 <div className="flex items-center justify-between mb-4 px-1">
                   <h3 className="font-bold text-slate-800">Bills & Recharges</h3>
@@ -163,7 +160,6 @@ const MainApp: React.FC = () => {
                 </div>
               </div>
 
-              {/* Recent Activity */}
               <div>
                 <div className="flex items-center justify-between mb-4 px-1">
                   <h3 className="font-bold text-slate-800">Recent Transactions</h3>
@@ -176,7 +172,6 @@ const MainApp: React.FC = () => {
                 </div>
               </div>
 
-              {/* Promotions / Rewards */}
               <div className="bg-orange-50 rounded-3xl p-6 border border-orange-100 flex items-center justify-between shadow-sm group cursor-pointer active:scale-[0.98] transition-transform" onClick={() => navigate('/rewards')}>
                 <div>
                   <h3 className="text-orange-900 font-bold mb-1">Get ₹500 Cashback</h3>
