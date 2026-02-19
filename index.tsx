@@ -3,33 +3,24 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 
-const renderApp = () => {
-  try {
-    const rootElement = document.getElementById('root');
-    if (!rootElement) {
-      console.error("Could not find root element");
-      return;
-    }
+const rootElement = document.getElementById('root');
 
+if (rootElement) {
+  try {
     const root = createRoot(rootElement);
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
-  } catch (err) {
-    console.error("Critical Render Error:", err);
+  } catch (error) {
+    console.error("Mounting Error:", error);
     const display = document.getElementById('error-display');
     if (display) {
       display.style.display = 'block';
-      display.innerHTML = '<h3>Critical Render Error</h3><pre>' + (err instanceof Error ? err.stack : String(err)) + '</pre>';
+      display.innerHTML = `<h3>Render Error</h3><pre>${error instanceof Error ? error.stack : String(error)}</pre>`;
     }
   }
-};
-
-// Ensure DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', renderApp);
 } else {
-  renderApp();
+  console.error("Root element not found in DOM");
 }
