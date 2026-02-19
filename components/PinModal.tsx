@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { X, Delete, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Delete, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 interface PinModalProps {
   isOpen: boolean;
@@ -9,9 +9,24 @@ interface PinModalProps {
   title?: string;
 }
 
-const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, title = "Enter UPI PIN" }) => {
+type ModalMode = 'enter' | 'set' | 'confirm';
+
+const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, title: initialTitle = "Enter UPI PIN" }) => {
   const [pin, setPin] = useState<string>("");
+  const [tempPin, setTempPin] = useState<string>("");
   const [error, setError] = useState(false);
+  const [mode, setMode] = useState<ModalMode>('enter');
+  const [storedPin, setStoredPin] = useState<string | null>(localStorage.getItem('payfast_upi_pin'));
+
+  useEffect(() => {
+    if (isOpen) {
+      const saved = localStorage.getItem('payfast_upi_pin');
+      setStoredPin(saved);
+      setMode(saved ? 'enter' : 'set');
+      setPin("");
+      setTempPin("");
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -19,27 +34,71 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, title =
     if (pin.length < 4) {
       const newPin = pin + num;
       setPin(newPin);
+      
       if (newPin.length === 4) {
-        // Mock PIN check
-        if (newPin === "1234") {
+        if (mode === 'enter') {
+          // Verify existing PIN
+          if (newPin === storedPin) {
+            setTimeout(() => {
+              onSuccess();
+              setPin("");
+              onClose();
+            }, 400);
+          } else {
+            handleError();
+          }
+        } else if (mode === 'set') {
+          // First step of setting PIN
+          setTempPin(newPin);
           setTimeout(() => {
-            onSuccess();
+            setMode('confirm');
             setPin("");
-            onClose();
-          }, 500);
-        } else {
-          setError(true);
-          setTimeout(() => {
-            setError(false);
-            setPin("");
-          }, 1000);
+          }, 300);
+        } else if (mode === 'confirm') {
+          // Confirming new PIN
+          if (newPin === tempPin) {
+            localStorage.setItem('payfast_upi_pin', newPin);
+            setStoredPin(newPin);
+            setTimeout(() => {
+              onSuccess();
+              setPin("");
+              onClose();
+            }, 400);
+          } else {
+            handleError();
+            // Reset to 'set' mode after error if they don't match
+            setTimeout(() => {
+              setMode('set');
+              setTempPin("");
+            }, 1000);
+          }
         }
       }
     }
   };
 
+  const handleError = () => {
+    setError(true);
+    setTimeout(() => {
+      setError(false);
+      setPin("");
+    }, 1000);
+  };
+
   const handleDelete = () => {
     setPin(pin.slice(0, -1));
+  };
+
+  const getDisplayTitle = () => {
+    if (mode === 'set') return "Set Your 4-Digit UPI PIN";
+    if (mode === 'confirm') return "Confirm Your New UPI PIN";
+    return initialTitle;
+  };
+
+  const getSubtext = () => {
+    if (mode === 'set') return "This PIN will be used for all transactions";
+    if (mode === 'confirm') return "Re-enter your PIN to confirm";
+    return "Secured by PayFast UPI Encryption";
   };
 
   return (
@@ -50,7 +109,7 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, title =
             <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-slate-800">{title}</h3>
+            <h3 className="font-bold text-slate-800 text-sm">{getDisplayTitle()}</h3>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <X className="w-6 h-6 text-slate-400" />
@@ -93,7 +152,12 @@ const PinModal: React.FC<PinModalProps> = ({ isOpen, onClose, onSuccess, title =
               <Delete className="w-6 h-6" />
             </button>
           </div>
-          <p className="mt-8 text-xs text-slate-400 font-medium">Secured by PayFast UPI Encryption</p>
+          
+          <div className="mt-8 text-center">
+            <p className={`text-xs font-medium transition-colors ${error ? 'text-red-500' : 'text-slate-400'}`}>
+              {error ? "Incorrect PIN. Try again." : getSubtext()}
+            </p>
+          </div>
         </div>
       </div>
     </div>
